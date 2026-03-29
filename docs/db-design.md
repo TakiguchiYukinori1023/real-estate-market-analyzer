@@ -36,7 +36,7 @@ Phase1では、生データと集計データを分離する。
 | id | bigint | 主キー |
 | line_name | string | 路線名 |
 | station_name | string | 駅名 |
-| display_name | 画面表示用の名称 |
+| display_name | string | 画面表示用の名称 |
 | created_at | timestamp | 作成日時 |
 | updated_at | timestamp | 更新日時 |
 
@@ -81,10 +81,10 @@ Phase1では、生データと集計データを分離する。
 ### 補足
 
 - 戸建ては Phase1 では延床面積ベースで扱う
-- `built_age` で入力された値は `built_year` に変換して保存する
+- `built_year` は Phase1 では任意入力とし、未入力の場合は null とする
+- `building_structure` は Phase1 では任意入力とし、未入力の場合は null とする
 - `walk_minutes` は Phase1 では任意入力とする
-- `is_new_build` は価格形成に大きな影響を与えるため Phase1 から保持する
-- management_fee_yen はマンション特有の属性であり、戸建ての場合は null とする
+- `management_fee_yen` はマンション特有の属性であり、戸建ての場合は null とする
 
 ---
 
@@ -106,7 +106,7 @@ Phase1では、生データと集計データを分離する。
 | property_id | bigint | `properties.id` への外部キー |
 | observed_on | date | 価格を観測した日付 |
 | price_yen | bigint | 観測時点の価格（円） |
-| price_per_sqm | decimal | ㎡単価。`price_yen / floor_area_sqm` |
+| price_per_sqm | integer | ㎡単価。`price_yen / floor_area_sqm` |
 | created_at | timestamp | 作成日時 |
 | updated_at | timestamp | 更新日時 |
 
@@ -138,9 +138,9 @@ Phase1では、生データと集計データを分離する。
 | floor_area_band | string | 面積帯。例: `60-80` |
 | built_year_band | string | 築年帯。例: `2010-2019` |
 | target_month | date | 集計対象月の先頭日 |
-| median_price_per_sqm | bigint | ㎡単価中央値 |
-| p25_price_per_sqm | bigint | 25パーセンタイル |
-| p75_price_per_sqm | bigint | 75パーセンタイル |
+| median_price_per_sqm | integer | ㎡単価中央値 |
+| p25_price_per_sqm | integer | 25パーセンタイル |
+| p75_price_per_sqm | integer | 75パーセンタイル |
 | sample_count | integer | 集計対象件数 |
 | created_at | timestamp | 作成日時 |
 | updated_at | timestamp | 更新日時 |
@@ -161,7 +161,7 @@ Phase1では、生データと集計データを分離する。
   - 駅の重複登録防止
   - 路線 + 駅名での一意性を担保する
 
-### properies
+### properties
 
 - `index(station_id)`
   - 駅ごとの物件検索を高速化する
@@ -187,6 +187,8 @@ Phase1では、生データと集計データを分離する。
   - 月次の時系列取得に利用する
 - `index(station_id, property_type, target_month)`
   - 駅 × 物件種別 × 月の相場取得を高速化する
+- `unique(station_id, property_type, floor_area_band, built_year_band, target_month)`
+  - 同一駅・同一物件種別・同一面積帯・同一築年帯・同一月の二重登録を防止する
 
 ---
 
