@@ -22,21 +22,18 @@ class PropertyPriceObservationSeeder extends Seeder
             'property_id' => $mansion->id,
             'observed_on' => '2026-03-01',
             'price_yen' => 59800000,
-            'price_per_sqm' => 872993,
         ]);
 
         PropertyPriceObservation::create([
             'property_id' => $mansion->id,
             'observed_on' => '2026-04-01',
             'price_yen' => 58800000,
-            'price_per_sqm' => 858394,
         ]);
 
         PropertyPriceObservation::create([
             'property_id' => $house->id,
             'observed_on' => '2026-04-01',
             'price_yen' => 69800000,
-            'price_per_sqm' => 676357,
         ]);
     }
 }

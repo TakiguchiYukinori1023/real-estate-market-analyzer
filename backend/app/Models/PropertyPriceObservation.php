@@ -19,6 +19,30 @@ class PropertyPriceObservation extends Model
     ];
 
     /**
+     * boot メソッドで保存前処理を定義
+     */
+    protected static function booted(): void
+    {
+        static::saving(function (PropertyPriceObservation $model) {
+
+            // property がない場合は何もしない
+            if (!$model->property) {
+                return;
+            }
+
+            // 面積がない or 0 の場合は計算しない
+            if (!$model->property->floor_area_sqm || $model->property->floor_area_sqm === 0) {
+                return;
+            }
+
+            // ㎡単価を計算
+            $model->price_per_sqm = (int) round(
+                $model->price_yen / $model->property->floor_area_sqm
+            );
+        });
+    }
+
+    /**
      * この観測データが属する物件
      */
     public function property(): BelongsTo
