@@ -15,7 +15,6 @@ class DatabaseSeeder extends Seeder
             StationSeeder::class,
             PropertySeeder::class,
             PropertyPriceObservationSeeder::class,
-            MarketPriceSeriesSeeder::class,
         ]);
     }
 }
