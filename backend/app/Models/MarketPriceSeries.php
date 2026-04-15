@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MarketPriceSeries extends Model
 {
+    /**
+     * @var array<int, string>
+     */
     protected $fillable = [
         'station_id',
         'property_type',
@@ -19,6 +22,9 @@ class MarketPriceSeries extends Model
         'sample_count',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'target_month' => 'date',
     ];
