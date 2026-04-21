@@ -630,6 +630,23 @@ private function buildGroupKey(PropertyPriceObservation $observation): string
 
 ---
 
+## 文字列連結
+
+文字列連結演算子（`.`）の前後には半角スペースを入れる。
+
+### OK
+```php
+'?' . http_build_query($params);
+```
+
+### NG
+```php
+'?'.httpd_build_query($params);
+'?'. httpd_build_query($params);
+```
+
+---
+
 ## 例外的に意識すること
 
 - 最初から完璧な設計を目指しすぎない
