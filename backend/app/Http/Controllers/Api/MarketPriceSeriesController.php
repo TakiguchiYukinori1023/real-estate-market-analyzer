@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_type=1);
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
@@ -23,8 +23,8 @@ final class MarketPriceSeriesController extends Controller
     /**
      * 集計済み相場データ一覧を取得する
      *
-     * @param MarketPriceSeriesIndexRequest $request
-     * @return AnonymousResourceCollection
+     * @param MarketPriceSeriesIndexRequest $request リクエスト
+     * @return AnonymousResourceCollection 集計済み相場データ一覧
      */
     public function index(
         MarketPriceSeriesIndexRequest $request,
@@ -32,8 +32,8 @@ final class MarketPriceSeriesController extends Controller
         /** @var array{
          *     station_id:int|string,
          *     property_type:string,
-         *     floor_area_band:string,
-         *     built_year_band:string
+         *     floor_area_band?:string,
+         *     built_year_band?:string
          * } $validated
          */
         $validated = $request->validated();
@@ -41,8 +41,8 @@ final class MarketPriceSeriesController extends Controller
         $series = $this->fetcher->fetch(
             stationId: (int) $validated['station_id'],
             propertyType: $validated['property_type'],
-            floorAreaBand: $validated['floor_area_band'],
-            builtYearBand: $validated['built_year_band'],
+            floorAreaBand: $validated['floor_area_band'] ?? null,
+            builtYearBand: $validated['built_year_band'] ?? null,
         );
 
         return MarketPriceSeriesResource::collection($series);

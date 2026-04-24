@@ -19,19 +19,6 @@ class MarketPriceSeriesIndexRequest extends FormRequest
     }
 
     /**
-     * バリデーション前に入力値を補完する
-     *
-     * @return void
-     */
-    protected function prepareForValidation()
-    {
-        $this->merge([
-            'floor_area_band' => $this->input('floor_area_band', 'all'),
-            'built_year_band' => $this->input('built_year_band', 'all'),
-        ]);
-    }
-
-    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
@@ -41,8 +28,16 @@ class MarketPriceSeriesIndexRequest extends FormRequest
         return [
             'station_id' => ['required', 'integer', 'exists:stations,id'],
             'property_type' => ['required', 'string', Rule::in(['mansion', 'house'])],
-            'floor_area_band' => ['required', 'string', Rule::in(['all'])],
-            'built_year_band' => ['required', 'string', Rule::in(['all'])],
+            'floor_area_band' => [
+                'nullable',
+                'string',
+                Rule::in(['under30', '30_50', '50_70', '70_90', '90_120', 'over120']),
+            ],
+            'built_year_band' => [
+                'nullable',
+                'string',
+                Rule::in(['0_5', '6_10', '11_20', '21_30', 'over_31']),
+            ],
         ];
     }
 

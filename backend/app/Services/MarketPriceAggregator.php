@@ -4,15 +4,20 @@ namespace App\Services;
 
 use App\Models\MarketPriceSeries;
 use App\Models\PropertyPriceObservation;
+use App\Services\MarketPrice\BandResolver;
 use Illuminate\Support\Collection;
 
 class MarketPriceAggregator
 {
-    private const DEFAULT_FLLOR_AREA_BAND = 'all';
-    private const DEFAULT_BUILT_YEAR_BAND = 'all';
+    public function __construct(
+        private readonly BandResolver $bandResolver,
+    ) {
+    }
 
     /**
-     **月次相場集計を実行し、作成件数を返す
+     * 月次相場集計を実行し、作成件数を返す
+     *
+     * @return int 作成件数
      */
     public function execute(): int
     {
@@ -59,17 +64,27 @@ class MarketPriceAggregator
 
     /**
      * グルーピングキーを生成する
+     *
+     * @param PropertyPriceObservation $obsservation 観測データ
+     * @return string グルーピングキー
      */
     private function buildGroupKey(PropertyPriceObservation $observation): string
     {
+        $property = $observation->property;
+
+        $floorAreaBand = $this->bandResolver->resolveFloorAreaBand((int) $property->floor_area_sqm);
+        $builtYearBand = $this->bandResolver->resolveBuiltYearBand((int) $property->built_year);
+
         $targetMonth = $observation->observed_on
             ->copy()
             ->startOfMonth()
             ->format('Y-m-d');
 
         return implode('|', [
-            $observation->property->station_id,
-            $observation->property->property_type,
+            $property->station_id,
+            $property->property_type,
+            $floorAreaBand,
+            $builtYearBand,
             $targetMonth,
         ]);
     }
@@ -78,7 +93,7 @@ class MarketPriceAggregator
      * グループ内の㎡単価一覧を抽出する
      *
      * @param Collection<int, PropertyPriceObservation> $groupedItems
-     * @return Collection<int, int>
+     * @return Collection<int, int> ㎡単価一覧
      */
     private function extractPricePerSqmList(Collection $groupedItems): Collection
     {
@@ -93,25 +108,28 @@ class MarketPriceAggregator
     /**
      * 集計結果を market_price_series に保存する
      *
-     * @param Collection<int, PropertyPriceObservation> $groupedItems
-     * @param Collection<int, int> $pricePerSqmList
+     * @param Collection<int, PropertyPriceObservation> $groupedItems グループ化された観測データ
+     * @param Collection<int, int> $pricePerSqmList ㎡単価一覧
+     * @return void
      */
     private function createMarketPriceSeries(Collection $groupedItems, Collection $pricePerSqmList): void
     {
         $firstObservation = $groupedItems->first();
+        $property = $firstObservation->property;
 
-        $stationId = $firstObservation->property->station_id;
-        $propertyType = $firstObservation->property->property_type;
+        $floorAreaBand = $this->bandResolver->resolveFloorAreaBand((int) $property->floor_area_sqm);
+        $builtYearBand = $this->bandResolver->resolveBuiltYearBand((int) $property->built_year);
+
         $targetMonth = $firstObservation->observed_on
             ->copy()
             ->startOfMonth()
             ->format('Y-m-d');
 
         MarketPriceSeries::create([
-            'station_id' => $stationId,
-            'property_type' => $propertyType,
-            'floor_area_band' => self::DEFAULT_FLLOR_AREA_BAND,
-            'built_year_band' => self::DEFAULT_BUILT_YEAR_BAND,
+            'station_id' => $property->station_id,
+            'property_type' => $property->property_type,
+            'floor_area_band' => $floorAreaBand,
+            'built_year_band' => $builtYearBand,
             'target_month' => $targetMonth,
             'median_price_per_sqm' => $this->percentile($pricePerSqmList, 0.5),
             'p25_price_per_sqm' => $this->percentile($pricePerSqmList, 0.25),
@@ -125,7 +143,9 @@ class MarketPriceAggregator
      *
      * Phase1ではシンプルに nearest-rank に近い方法で算出する。
      *
-     * @param \Illuminate\Support\Collection<int, int> $sortedValues
+     * @param Collection<int, int> $sortedValues 昇順に並んだ数値一覧
+     * @pram float $percentile パーセンタイル
+     * @return int パーセンタイル値
      */
     private function percentile(Collection $sortedValues, float $percentile): int
     {
