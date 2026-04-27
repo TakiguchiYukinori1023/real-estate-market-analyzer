@@ -66,11 +66,13 @@ Phase1 開発中
 - Unitテスト
 - Featureテスト
 
+---
+
 ## API例
 
 ### リクエスト
 
-    GET /api/market-price-series?sstation_id=1&property_type=mansion&floor_area_band=50_70
+    GET /api/market-price-series?station_id=1&property_type=mansion&floor_area_band=50_70
 
 ### レスポンス
 
@@ -95,7 +97,7 @@ Phase1 開発中
 ### 生データと集計データの分離
 
 #### 生データ
-- priperties
+- properties
 - property_price_observations
 
 #### 集計データ
@@ -108,6 +110,17 @@ Phase1 開発中
 - APIレスポンスの高速化
 
 を実現しています。
+
+---
+
+## 開発における工夫
+
+本開発では、ChatGPTやCodexなどのAIツールを活用し、設計検討やコードレビューの補助として利用しています。
+
+ただし、AIの出力をそのまま採用するのではなく、仕様との整合性や影響範囲を自身で検証し、理解した上で実装に反映することを意識しています。
+特に今回の帯分けロジックやAPI設計においては、テストコードやレビューを通じて妥当性を確認しながら改善を行いました。
+
+AIを単なるコード生成ツールとしてではなく、「レビュー・設計補助」として活用することで、品質と理解の両立を図っています。
 
 ---
 
@@ -164,13 +177,15 @@ erDiagram
 
 ---
 
-### 今後の予定
+## 今後の予定
 
 - フロントエンド実装
 - 相場推移グラフの表示
 - APIレスポンスの改善
 - CI/CD整備
 - READMEへの画面キャプチャ追加
+
+---
 
 ## 補足
 
