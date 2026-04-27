@@ -36,7 +36,7 @@ class MarketPriceSeriesIndexRequest extends FormRequest
             'built_year_band' => [
                 'nullable',
                 'string',
-                Rule::in(['0_5', '6_10', '11_20', '21_30', 'over_31']),
+                Rule::in(['0_5', '6_10', '11_20', '21_30', 'over31']),
             ],
         ];
     }

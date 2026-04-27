@@ -58,7 +58,11 @@ class MarketPriceAggregator
     {
         return PropertyPriceObservation::query()
             ->with('property')
-            ->whereHas('property')
+            ->whereHas('property', function ($query): void {
+                $query
+                    ->whereNotNull('floor_area_sqm')
+                    ->whereNotNull('built_year');
+            })
             ->get();
     }
 

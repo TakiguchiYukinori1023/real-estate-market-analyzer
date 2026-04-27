@@ -44,6 +44,8 @@ final class MarketPriceSeriesTest extends TestCase
                 'data' => [
                     [
                         'target_month' => '2025-01',
+                        'floor_area_band' => '50_70',
+                        'built_year_band' => '11_20',
                         'median_price_per_sqm' => 820000,
                         'p25_price_per_sqm' => 760000,
                         'p75_price_per_sqm' => 900000,
@@ -217,6 +219,7 @@ final class MarketPriceSeriesTest extends TestCase
         $response
             ->assertOk()
             ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.floor_area_band', '50_70')
             ->assertJsonPath('data.0.median_price_per_sqm', 900000)
             ->assertJsonPath('data.0.sample_count', 10);
     }
@@ -262,6 +265,7 @@ final class MarketPriceSeriesTest extends TestCase
         $response
             ->assertOk()
             ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.built_year_band', '21_30')
             ->assertJsonPath('data.0.median_price_per_sqm', 900000)
             ->assertJsonPath('data.0.sample_count', 10);
     }
