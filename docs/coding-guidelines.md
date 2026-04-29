@@ -94,6 +94,94 @@ if ($count > 0) {
 
 ---
 
+### フロントエンドのコーディングスタイル
+
+#### 対象
+
+以下のフロントエンドコードを対象とする。
+
+- TypeScript
+- TSX
+- Reactコンポーネント
+- Next.js App Router 配下のファイル
+
+---
+
+#### インデント
+
+- TypeScript / TSX / React コンポーネントではスペース2つを使用する
+- PHP / Laravel では従来通りスペース4つを使用する
+- タブは使用しない
+
+#### 理由
+
+React / TSX は JSX によってネストが深くなりやすいため、
+フロントエンドでは可読性と横幅のバランスを考慮してスペース2つを採用する。
+
+```tsx
+export default function Page() {
+  return (
+    <main>
+      <section>
+        <p>Sample</p>
+      </section>
+    </main>
+  );
+}
+```
+
+#### 命名規則
+
+- 変数名・関数名は `camelCase` を使用する
+- React コンポーネント名は `PascalCase` を使用する
+- 型名は `PascalCase` を使用する
+- APIレスポンスに合わせる値は、必要に応じて `snake_case` を許容する
+
+```ts
+type MarketPriceSeries = {
+  target_month: string;
+  median_price_per_sqm: number;
+};
+
+function fetchMarketPriceSeries() {
+  // ...
+}
+```
+
+---
+
+#### 型定義
+
+- APIレスポンスは TypeScript の型を定義して扱う
+- `any` は原則として使用しない
+- nullable / optional な値は `?` を使って明示する
+
+```ts
+type FetchMarketPriceSeriesParams = {
+  stationId: number;
+  propertyType: string;
+  floorAreaBand?: string;
+  builtYearBand?: string;
+};
+```
+
+---
+
+#### API通信
+
+- API通信処理は画面コンポーネントに直接書きすぎない
+- `features/xxx/api` 配下に取得処理を分離する
+- レスポンス形式が変わった場合に修正箇所を追いやすくする
+
+```txt
+features/
+  market-price/
+    api/
+    types/
+```
+
+---
+
 ## 適用範囲
 
 本規約は、主に以下を対象とする。
