@@ -24,11 +24,11 @@ class AggregateMarketPrice extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): int
+    public function handle(MarketPriceAggregator $aggregator): int
     {
         $this->info('月次相場集計を開始します。');
 
-        $createdCount =  (new MarketPriceAggregator())->execute();
+        $createdCount = $aggregator->execute();
 
         if ($createdCount === 0) {
             $this->warn('集計対象データが存在しません。');
