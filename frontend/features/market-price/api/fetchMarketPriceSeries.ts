@@ -1,11 +1,19 @@
-import type { MarketPriceSeries } from "../types/maketPrice";
+import type {
+  BuiltYearBand,
+  FloorAreaBand,
+  MarketPriceSeries,
+  PropertyType,
+} from "../types/maketPrice";
 
 type FetchMarketPriceSeriesParams = {
   stationId: number;
-  propertyType: string;
-  floorAreaBand?: string;
-  builtYearBand?: string;
+  propertyType: PropertyType;
+  floorAreaBand?: FloorAreaBand;
+  builtYearBand?: BuiltYearBand;
 };
+
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080';
 
 export async function fetchMarketPriceSeries({
   stationId,
@@ -26,29 +34,22 @@ export async function fetchMarketPriceSeries({
     params.append('built_year_band', builtYearBand);
   }
 
-  const url = `http://localhost:8080/api/market-price-series?${params.toString()}`;
-
-  const response = await fetch(url, {
-    headers: {
-      Accept: 'application/json',
-    },
-  });
-
-  const text = await response.text();
-
-  if (!response.ok) {
-    console.error(text);
-
-    throw new Error('相場推移データの取得に失敗しました');
-  }
+  const url = `${API_BASE_URL}/api/market-price-series?${params.toString()}`;
 
   try {
-    const json = JSON.parse(text);
+    const response = await fetch(url, {
+      headers: {
+        Accept: 'application/json',
+      },
+    });
 
+    if (!response.ok) {
+      throw new Error(`APIエラー: ${response.status}`);
+    }
+
+    const json = await response.json();
     return json.data;
-  } catch {
-    console.error(text);
-
-    throw new Error('APIレスポンスがJSON形式ではありません');
+  } catch (error) {
+    throw error;
   }
 }
