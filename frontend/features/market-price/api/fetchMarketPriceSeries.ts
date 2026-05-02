@@ -3,7 +3,7 @@ import type {
   FloorAreaBand,
   MarketPriceSeries,
   PropertyType,
-} from "../types/maketPrice";
+} from "../types/marketPrice";
 
 type FetchMarketPriceSeriesParams = {
   stationId: number;
