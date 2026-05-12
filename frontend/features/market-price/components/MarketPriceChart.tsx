@@ -18,6 +18,16 @@ type Props = {
 };
 
 export default function MarketPriceChart({ data }: Props) {
+  if (data.length === 0) {
+    return (
+      <div className="flex h-[400px] items-center justify-center rounded border border-gray-200 bg-gray-50">
+        <p className="text-sm text-gray-600">
+          該当する相場データがありません。
+        </p>
+      </div>
+    );
+  }
+
   return (
     <ResponsiveContainer width="100%" height={400}>
       <LineChart data={data}>
